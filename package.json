@@ -1,0 +1,20 @@
+{
+  "name": "jobtool",
+  "version": "1.0.0",
+  "description": "A basic Node.js project for job tool automation.",
+  "main": "setup.js",
+  "type": "module",
+  "scripts": {
+    "start": "node setup.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^11.3.1",
+    "inquirer": "^12.9.4",
+    "jobtool": "link:",
+    "pdf-parse": "^1.1.1",
+    "prompt-sync": "^4.2.0"
+  }
+}
