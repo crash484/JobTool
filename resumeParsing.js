@@ -24,7 +24,7 @@ async function resumeParsing() {
     userData.resumeStructured = structured;
     await fs.writeJson("userData.json",userData,{ spaces:2 });
 
-    console.log("resume parsed and saved");
+    console.log("resume parsed and saved ur welcome");
 }
 
 resumeParsing();

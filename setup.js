@@ -26,7 +26,7 @@ async function setup() {
 async function parseResume(answers) {
   try {
     if (!(await fs.pathExists(answers.resumePath))) {
-      throw new Error("Resume file not found at " + answers.resumePath);
+      throw new Error("cant find ur resume bro" + answers.resumePath);
     }
 
     const dataBuffer = await fs.readFile(answers.resumePath);
@@ -39,7 +39,7 @@ async function parseResume(answers) {
 
     await fs.writeJson("userData.json", userData, { spaces: 2 });
 
-    console.log("Stored API key and resume locally.");
+    console.log("Stored API key and resume teehee.");
   } catch (err) {
     oops(err);
   }
