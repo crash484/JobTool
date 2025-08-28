@@ -20,3 +20,12 @@ build/
 *.swp
 .idea/
 .vscode/
+
+resume.pdf
+Resume.pdf
+*resume*.pdf
+
+ShashwatJainResume.pdf
+userData.json
+
+
