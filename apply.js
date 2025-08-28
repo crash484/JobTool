@@ -122,9 +122,9 @@ Be concise and pick the best reasonable mapping from the resume.
           el.dispatchEvent(new Event("input", { bubbles: true }));
         }, handle, String(val));
       }
-      console.log(`✅ Filled element #${i} (${el.tag}${el.name ? " name="+el.name : el.id ? " id="+el.id : ""})`);
+      console.log(`Filled element #${i} (${el.tag}${el.name ? " name="+el.name : el.id ? " id="+el.id : ""})`);
     } catch (err) {
-      console.log(`⚠️ Failed to fill element #${i}:`, err && err.message ? err.message : err);
+      console.log(`Failed to fill element #${i}:`, err && err.message ? err.message : err);
     }
   }
 }
@@ -138,7 +138,7 @@ export async function applyToJob(url, user, resumeStructured, options = {}) {
   }
   const resume = resumeStructured || userData.resumeStructured;
   if (!resume) {
-    throw new Error("No structured resume data available.");
+    throw new Error("No structured resume data available bruh.");
   }
 
   // Setup Gemini
@@ -169,7 +169,7 @@ export async function applyToJob(url, user, resumeStructured, options = {}) {
   try {
     new URL(url);
   } catch (err) {
-    console.error("❌ Invalid URL provided. The browser is open for inspection.");
+    console.error("Invalid URL provided. The browser is open for inspection.");
     return { ok: false, reason: "invalid-url" };
   }
 
