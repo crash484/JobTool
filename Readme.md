@@ -2,8 +2,7 @@
 # Jobtool
 
 A small Node.js utility that helps automate job applications by parsing your resume and using an AI assistant to fill web application forms.  
-The tool opens a visible Chrome window so you can watch and review every step.
-
+This takes around 15minutes to setup and then u can apply to jobs without having to fill all the info again and again
 ---
 
 ## How it works (simple)
@@ -36,6 +35,12 @@ npx playwright install
 ```bash
 # 4. Copy your resume into the cloned directory :
 cp /path/to/your/resume.pdf ./resume.pdf
+```
+##In the pdf parse package there is debugging mode on, so turn it off for it run properly by 
+```bash
+if(!isDebugMode){
+   // rest of program..
+}
 ```
 
 ```bash
