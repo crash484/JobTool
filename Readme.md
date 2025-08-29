@@ -38,6 +38,7 @@ cp /path/to/your/resume.pdf ./resume.pdf
 ```
 ##In the pdf parse package there is debugging mode on, so turn it off for it run properly by 
 ```bash
+/node_modules/pdf-parse/index.js
 if(!isDebugMode){
    // rest of program..
 }
