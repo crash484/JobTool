@@ -14,8 +14,13 @@ function askQuestion(query) {
   }));
 }
 
-// helper: use AI to compute values for all form controls and fill them
-async function fillFormWithAI(page, resume, model) {
+//will read from userData.json internally
+async function fillFormWithAI(page, model) {
+  // read userData for resume/details
+  const userData = await fs.readJson("userData.json");
+  const resume = userData.resumeStructured;
+  const details = userData.details || {};
+
   // get element metadata in page order (inputs, textareas, selects)
   const elements = await page.$$eval("input, textarea, select", (els) =>
     els.map((el, i) => {
@@ -39,10 +44,13 @@ async function fillFormWithAI(page, resume, model) {
     return;
   }
 
-  // prompt the model to map resume -> values for each element (index aligned)
+  // prompt the model to map resume + details -> values for each element (index aligned)
   const prompt = `
 You are a helpful assistant that fills web forms for job applications.
+Use the provided resume and personal details to choose the best answers for each form control.
 Resume (JSON): ${JSON.stringify(resume, null, 2)}
+
+Personal details (JSON): ${JSON.stringify(details || {}, null, 2)}
 
 The form contains ${elements.length} elements. Here are their metadata objects (index matches DOM order):
 ${JSON.stringify(elements, null, 2)}
@@ -53,7 +61,7 @@ where values[i] is the string/value to set for element at index i.
 - For text inputs/textarea return the text to fill.
 - For select return the option value to select.
 - For checkboxes/radio return true/false.
-Be concise and pick the best reasonable mapping from the resume.
+Be concise and pick the best reasonable mapping from the resume and personal details.
 `;
 
   let aiText;
@@ -130,15 +138,28 @@ Be concise and pick the best reasonable mapping from the resume.
 }
 
 // Exported function so jobtool.js can call it directly
-export async function applyToJob(url, user, resumeStructured, options = {}) {
-  // Load user/resume from arguments or from disk
-  let userData = user;
-  if (!userData) {
+// changed: signature simplified to (url, options={})
+async function applyToJob(url, options = {}) {
+  // Always load userData from disk
+  let userData;
+  try {
     userData = await fs.readJson("userData.json");
+  } catch (err) {
+    console.error("userData.json not found. Please run the setup to create it: node setup.js");
+    process.exit(1);
   }
-  const resume = resumeStructured || userData.resumeStructured;
+
+  // If structured resume or personal details are missing, instruct user to run setup and exit
+  if (!userData.resumeStructured || !userData.details) {
+    console.error("userData.json exists but is missing required data (structured resume or personal details).");
+    console.error("Please run 'node setup.js' to create/update your data, then re-run 'node apply.js'.");
+    process.exit(1);
+  }
+
+  const resume = userData.resumeStructured;
   if (!resume) {
-    throw new Error("No structured resume data available bruh.");
+    console.error("Structured resume still missing after setup. Aborting.");
+    process.exit(1);
   }
 
   // Setup Gemini
@@ -169,7 +190,7 @@ export async function applyToJob(url, user, resumeStructured, options = {}) {
   try {
     new URL(url);
   } catch (err) {
-    console.error("Invalid URL provided. The browser is open for inspection.");
+    console.error("wrong url try again bruh.");
     return { ok: false, reason: "invalid-url" };
   }
 
@@ -187,7 +208,8 @@ export async function applyToJob(url, user, resumeStructured, options = {}) {
 
   // Use AI to detect and fill form controls
   try {
-    await fillFormWithAI(page, resume, model);
+    // changed: no resume/details arguments, helper will read userData itself
+    await fillFormWithAI(page, model);
   } catch (err) {
     console.error("AI-driven autofill failed:", err && err.message ? err.message : err);
     return { ok: false, reason: "ai-failed" };
@@ -228,7 +250,7 @@ if (process.argv[1] && process.argv[1].endsWith("apply.js")) {
 
     // wait for user to type "go"
     while (true) {
-      const ans = await askQuestion('Type "go" to start AI autofill (or "exit" to quit): ');
+      const ans = await askQuestion('Type "go" to start AI autofill (or exit): ');
       if (ans.toLowerCase() === "go") break;
       if (ans.toLowerCase() === "exit") {
         console.log("Exiting. Browser remains open for manual inspection.");
@@ -238,13 +260,13 @@ if (process.argv[1] && process.argv[1].endsWith("apply.js")) {
     }
 
     try {
-      const userData = await fs.readJson("userData.json");
       // reuse the already-open page by passing it as option
-      await applyToJob(url, userData, userData.resumeStructured, { page });
+      await applyToJob(url, { page });
     } catch (err) {
       console.error("i failed ;( :", err && err.message ? err.message : err);
       process.exit(1);
-    }
+    } 
   })();
 }
+
 

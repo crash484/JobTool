@@ -13,6 +13,16 @@ async function setup() {
       { type: "input", name: "resumePath", message: "Enter path to your resume:" }
     ]);
 
+    // Prompt for additional personal details
+    const details = await inquirer.prompt([
+      { type: "input", name: "address", message: "Enter your address (optional):" },
+      { type: "input", name: "Registration/application number", message: "Enter your Registration or application number:" },
+      { type: "list", name: "gender", message: "Select your gender:", choices: ["Male", "Female", "Other", "Prefer not to say"], default: "Prefer not to say" }
+    ]);
+
+    // attach details to answers
+    answers.details = details;
+
     // resolve resume path to absolute
     answers.resumePath = path.resolve(answers.resumePath);
 
@@ -35,11 +45,13 @@ async function parseResume(answers) {
     const userData = {
       apiKey: answers.apiKey,
       resumeRaw: pdfData.text,
+      resumePath: answers.resumePath,
+      details: answers.details
     };
 
     await fs.writeJson("userData.json", userData, { spaces: 2 });
 
-    console.log("Stored API key and resume teehee.");
+    console.log("Stored API key, resume, and details.");
   } catch (err) {
     oops(err);
   }
